@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traductor Estircoppt</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0e0e0e;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      overflow: hidden;
+    }
+    textarea {
+      width: 80%;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: none;
+      resize: none;
+      z-index: 1;
+      position: relative;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 1;
+      position: relative;
+      margin: 5px;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      z-index: 1;
+    }
+    .output {
+      margin-top: 20px;
+      background-color: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      font-size: 18px;
+      z-index: 1;
+      position: relative;
+      white-space: pre-wrap;
+    }
+    .matrix-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="matrix-bg">
+    <canvas id="matrix"></canvas>
+  </div>
+
+  <h1>Traductor a Estircoppt</h1>
+  <p>Escribe tu mensaje en español y tradúcelo a Estircoppt.</p>
+  <textarea id="inputText" placeholder="Escribe aquí..."></textarea>
+  <div class="button-group">
+    <button onclick="traducir()">Español → Estircoppt</button>
+    <button onclick="destraducir()">Estircoppt → Español</button>
+    <button onclick="copiarResultado()">📋 Copiar resultado</button>
+  </div>
+  <div class="output" id="outputText">Tu traducción aparecerá aquí...</div>
+
+  <script>
+    let textoOriginal = "";
+
+    function traducir() {
+      const input = document.getElementById("inputText").value;
+
+      if (input.trim() === "") {
+        document.getElementById("outputText").innerText = "Por favor, escribe algo.";
+        return;
+      }
+      textoOriginal = input.trim();
+      const palabras = textoOriginal.split(/\s+/);
+      const traduccion = palabras.map(() => ":;//").join(" ");
+      document.getElementById("outputText").innerText = traduccion;
+    }
+
+    function destraducir() {
+      if (textoOriginal === "") {
+        document.getElementById("outputText").innerText = "Primero traduce algo para poder revertirlo.";
+        return;
+      }
+      document.getElementById("outputText").innerText = textoOriginal;
+    }
+
+    function copiarResultado() {
+      const texto = document.getElementById("outputText").innerText;
+      navigator.clipboard.writeText(texto).then(() => {
+        alert("Texto copiado al portapapeles.");
+      }).catch(err => {
+        alert("No se pudo copiar el texto.");
+      });
+    }
+
+    // Matrix background animation
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 33);
+    window.addEventListener("resize", () => location.reload());
+  </script>
+</body>
+</html>
+
